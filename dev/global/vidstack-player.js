@@ -1,13 +1,13 @@
 import '../define/vidstack-player.js';
 import { isString, defineCustomElement, kebabToCamelCase } from '../chunks/vidstack-DVpy0IqK.js';
-import { isHTMLAudioElement, isHTMLVideoElement, isHTMLIFrameElement } from '../chunks/vidstack-Dn9nMoEW.js';
+import { isHTMLAudioElement, isHTMLVideoElement, isHTMLIFrameElement } from '../chunks/vidstack-Gf_DI1v6.js';
 import { isHTMLElement } from '../chunks/vidstack-CGUlKgT8.js';
-import '../chunks/vidstack-3JWzcpEe.js';
+import '../chunks/vidstack-s5-dXkiU.js';
 import '../chunks/vidstack-CUYciP40.js';
-import '../chunks/vidstack-CrZuJYaH.js';
+import '../chunks/vidstack-uKxEd7nI.js';
 import '../chunks/vidstack-B5ElR9su.js';
-import '../chunks/vidstack-DghpoXbA.js';
-import '../chunks/vidstack-BgIVvpNy.js';
+import '../chunks/vidstack-Dn8_b_Q6.js';
+import '../chunks/vidstack-DCY5OwWc.js';
 import '../chunks/vidstack-C1THCRTj.js';
 import '../chunks/vidstack-Dv_LIPFu.js';
 import '../chunks/vidstack-Bpr4fI4n.js';
@@ -71,7 +71,7 @@ class VidstackPlayer {
     player.setAttribute("keep-alive", "");
     if (props.poster && layout?.name !== "plyr") {
       if (!customElements.get("media-poster")) {
-        const { MediaPosterElement } = await import('../chunks/vidstack-BrQmGphD.js');
+        const { MediaPosterElement } = await import('../chunks/vidstack-D2Gpq24o.js');
         defineCustomElement(MediaPosterElement);
       }
       const poster = document.createElement("media-poster");

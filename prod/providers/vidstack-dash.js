@@ -1,15 +1,15 @@
-import { loadScript, preconnect } from '../chunks/vidstack-vDnjyKV8.js';
-import { canPlayVideoType, canPlayAudioType, IS_CHROME, isDASHSupported } from '../chunks/vidstack-DyMkFGuS.js';
+import { loadScript, preconnect } from '../chunks/vidstack-A9j--j6J.js';
+import { canPlayVideoType, canPlayAudioType, IS_CHROME, isDASHSupported } from '../chunks/vidstack-DwhHIY5e.js';
 import { VideoProvider } from './vidstack-video.js';
 import { listenEvent, effect, DOMEvent, isNumber, isString, camelToKebabCase, isUndefined, isFunction, peek } from '../chunks/vidstack-CRlI3Mh7.js';
 import { QualitySymbol } from '../chunks/vidstack-B01xzxC4.js';
-import { TextTrackSymbol, TextTrack } from '../chunks/vidstack-B5628Ni3.js';
+import { TextTrackSymbol, TextTrack } from '../chunks/vidstack-oyBGi0R4.js';
 import { ListSymbol } from '../chunks/vidstack-D5EzK014.js';
 import { RAFLoop } from '../chunks/vidstack-DSYpsFWk.js';
 import { coerceToError } from '../chunks/vidstack-C9vIqaYT.js';
 import './vidstack-html.js';
 import '../chunks/vidstack-Dihypf8P.js';
-import '../chunks/vidstack-CSv7rfHP.js';
+import '../chunks/vidstack-CGXAe0PE.js';
 import '../chunks/vidstack-DE4XvkHU.js';
 
 function getLangName(langCode) {

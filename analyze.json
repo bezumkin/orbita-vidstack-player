@@ -1654,7 +1654,7 @@
             "concise": "number",
             "full": "number"
           },
-          "docs": "Limit playback to only play _after_ a certain time. Playback will being from this time."
+          "docs": "Limit playback to only play _after_ a certain time. Playback will begin from this time."
         },
         {
           "name": "clipEndTime",
@@ -1739,13 +1739,13 @@
         },
         {
           "name": "minLiveDVRWindow",
-          "default": "30",
+          "default": "60",
           "type": {
             "primitive": "number",
             "concise": "number",
             "full": "number"
           },
-          "docs": "The minimum seekable length in seconds before seeking operations are permitted."
+          "docs": "The minimum seekable length in seconds before seeking operations are permitted on live streams."
         },
         {
           "name": "muted",
@@ -6308,6 +6308,16 @@
           "readonly": true
         },
         {
+          "name": "bufferedWindow",
+          "type": {
+            "primitive": "number",
+            "concise": "number",
+            "full": "number"
+          },
+          "docs": "The length of the buffered window in seconds from `bufferedStart` to `bufferedEnd`.",
+          "readonly": true
+        },
+        {
           "name": "duration",
           "type": {
             "primitive": "number",
@@ -6538,7 +6548,7 @@
             "concise": "number",
             "full": "number"
           },
-          "docs": "Limit playback to only play _after_ a certain time. Playback will being from this time.",
+          "docs": "Limit playback to only play _after_ a certain time. Playback will begin from this time.",
           "doctags": [
             {
               "name": "defaultValue",
@@ -6820,14 +6830,34 @@
             "concise": "number",
             "full": "number"
           },
-          "docs": "The minimum seekable length in seconds before seeking operations are permitted.",
+          "docs": "The minimum seekable length in seconds before seeking operations are permitted on live streams.",
           "doctags": [
             {
               "name": "defaultValue",
-              "text": "30"
+              "text": "60"
             }
           ],
           "default": "60"
+        },
+        {
+          "name": "liveDVRWindow",
+          "type": {
+            "primitive": "number",
+            "concise": "number",
+            "full": "number"
+          },
+          "docs": "The inferred length of the live DVR window.",
+          "readonly": true
+        },
+        {
+          "name": "isLiveDVR",
+          "type": {
+            "primitive": "boolean",
+            "concise": "boolean",
+            "full": "boolean"
+          },
+          "docs": "Whether the live stream has Digital Video Recording (DVR) enabled.",
+          "readonly": true
         },
         {
           "name": "liveEdge",
@@ -7623,21 +7653,6 @@
           "internal": true
         },
         {
-          "name": "realDuration",
-          "type": {
-            "primitive": "number",
-            "concise": "number",
-            "full": "number"
-          },
-          "doctags": [
-            {
-              "name": "internal"
-            }
-          ],
-          "readonly": true,
-          "internal": true
-        },
-        {
           "name": "providedDuration",
           "type": {
             "primitive": "number",
@@ -7726,6 +7741,15 @@
           ],
           "default": "'unknown'",
           "internal": true
+        },
+        {
+          "name": "inferredLiveDVRWindow",
+          "type": {
+            "primitive": "number",
+            "concise": "number",
+            "full": "number"
+          },
+          "default": "0"
         },
         {
           "name": "liveSyncPosition",
@@ -9255,7 +9279,7 @@
           "type": {
             "primitive": "string",
             "concise": "GestureEventType",
-            "full": "keyof HTMLElementEventMap | 'dblended' | 'dblerror' | 'dblplaying' | 'dblseeking' | 'dblwaiting' | 'dblplay' | 'dblprogress' | 'dblmedia-player-connect' | 'dblfind-media-player' | 'dblfullscreenchange' | 'dblfullscreenerror' | 'dblabort' | 'dblanimationcancel' | 'dblanimationend' | 'dblanimationiteration' | 'dblanimationstart' | 'dblauxclick' | 'dblbeforeinput' | 'dblbeforetoggle' | 'dblblur' | 'dblcancel' | 'dblcanplay' | 'dblcanplaythrough' | 'dblchange' | 'dblclose' | 'dblcompositionend' | 'dblcompositionstart' | 'dblcompositionupdate' | 'dblcontextmenu' | 'dblcopy' | 'dblcuechange' | 'dblcut' | 'dbldblclick' | 'dbldrag' | 'dbldragend' | 'dbldragenter' | 'dbldragleave' | 'dbldragover' | 'dbldragstart' | 'dbldrop' | 'dbldurationchange' | 'dblemptied' | 'dblfocus' | 'dblfocusin' | 'dblfocusout' | 'dblformdata' | 'dblgotpointercapture' | 'dblinput' | 'dblinvalid' | 'dblkeydown' | 'dblkeypress' | 'dblkeyup' | 'dblload' | 'dblloadeddata' | 'dblloadedmetadata' | 'dblloadstart' | 'dbllostpointercapture' | 'dblmousedown' | 'dblmouseenter' | 'dblmouseleave' | 'dblmousemove' | 'dblmouseout' | 'dblmouseover' | 'dblmouseup' | 'dblpaste' | 'dblpause' | 'dblpointercancel' | 'dblpointerdown' | 'dblpointerenter' | 'dblpointerleave' | 'dblpointermove' | 'dblpointerout' | 'dblpointerover' | 'dblpointerup' | 'dblratechange' | 'dblreset' | 'dblresize' | 'dblscroll' | 'dblscrollend' | 'dblsecuritypolicyviolation' | 'dblseeked' | 'dblselect' | 'dblselectionchange' | 'dblselectstart' | 'dblslotchange' | 'dblstalled' | 'dblsubmit' | 'dblsuspend' | 'dbltimeupdate' | 'dbltoggle' | 'dbltouchcancel' | 'dbltouchend' | 'dbltouchmove' | 'dbltouchstart' | 'dbltransitioncancel' | 'dbltransitionend' | 'dbltransitionrun' | 'dbltransitionstart' | 'dblvolumechange' | 'dblwebkitanimationend' | 'dblwebkitanimationiteration' | 'dblwebkitanimationstart' | 'dblwebkittransitionend' | 'dblwheel' | 'dblbeforeunload' | 'dblpageshow' | 'dblpagehide' | 'dblvisibilitychange' | 'dblenterpictureinpicture' | 'dblleavepictureinpicture' | 'dblwebkitpresentationmodechanged' | 'dblvds-log'"
+            "full": "keyof HTMLElementEventMap | 'dblended' | 'dblerror' | 'dblplaying' | 'dblseeking' | 'dblwaiting' | 'dblplay' | 'dblprogress' | 'dblmedia-player-connect' | 'dblfind-media-player' | 'dblfullscreenchange' | 'dblfullscreenerror' | 'dblabort' | 'dblanimationcancel' | 'dblanimationend' | 'dblanimationiteration' | 'dblanimationstart' | 'dblauxclick' | 'dblbeforeinput' | 'dblbeforetoggle' | 'dblblur' | 'dblcancel' | 'dblcanplay' | 'dblcanplaythrough' | 'dblchange' | 'dblclose' | 'dblcompositionend' | 'dblcompositionstart' | 'dblcompositionupdate' | 'dblcontextlost' | 'dblcontextmenu' | 'dblcontextrestored' | 'dblcopy' | 'dblcuechange' | 'dblcut' | 'dbldblclick' | 'dbldrag' | 'dbldragend' | 'dbldragenter' | 'dbldragleave' | 'dbldragover' | 'dbldragstart' | 'dbldrop' | 'dbldurationchange' | 'dblemptied' | 'dblfocus' | 'dblfocusin' | 'dblfocusout' | 'dblformdata' | 'dblgotpointercapture' | 'dblinput' | 'dblinvalid' | 'dblkeydown' | 'dblkeypress' | 'dblkeyup' | 'dblload' | 'dblloadeddata' | 'dblloadedmetadata' | 'dblloadstart' | 'dbllostpointercapture' | 'dblmousedown' | 'dblmouseenter' | 'dblmouseleave' | 'dblmousemove' | 'dblmouseout' | 'dblmouseover' | 'dblmouseup' | 'dblpaste' | 'dblpause' | 'dblpointercancel' | 'dblpointerdown' | 'dblpointerenter' | 'dblpointerleave' | 'dblpointermove' | 'dblpointerout' | 'dblpointerover' | 'dblpointerup' | 'dblratechange' | 'dblreset' | 'dblresize' | 'dblscroll' | 'dblscrollend' | 'dblsecuritypolicyviolation' | 'dblseeked' | 'dblselect' | 'dblselectionchange' | 'dblselectstart' | 'dblslotchange' | 'dblstalled' | 'dblsubmit' | 'dblsuspend' | 'dbltimeupdate' | 'dbltoggle' | 'dbltouchcancel' | 'dbltouchend' | 'dbltouchmove' | 'dbltouchstart' | 'dbltransitioncancel' | 'dbltransitionend' | 'dbltransitionrun' | 'dbltransitionstart' | 'dblvolumechange' | 'dblwebkitanimationend' | 'dblwebkitanimationiteration' | 'dblwebkitanimationstart' | 'dblwebkittransitionend' | 'dblwheel' | 'dblbeforeunload' | 'dblpageshow' | 'dblpagehide' | 'dblvisibilitychange' | 'dblenterpictureinpicture' | 'dblleavepictureinpicture' | 'dblwebkitpresentationmodechanged' | 'dblvds-log'"
           },
           "docs": "The DOM event type that will trigger this gesture. It can be any valid DOM event type. Any\nevent can be prefixed with `dbl` to ensure it occurs twice in succession (max 200ms gap).",
           "doctags": [

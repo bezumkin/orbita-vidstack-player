@@ -1,4 +1,4 @@
-import { FileDownloadInfo, MediaPlayerProps, PlyrLayoutProps, LogLevel, TextTrackInit, PlyrLayoutTranslations, MediaPlayerState, MediaViewType, PlayerSrc, MediaEvents, MediaTextTrackChangeEvent, MediaControlsChangeEvent, MediaFullscreenChangeEvent, MediaRateChangeEvent, MediaCanPlayEvent, MediaTimeUpdateEvent, MediaVolumeChangeEvent } from '../types/vidstack-DdBJnM5A.js';
+import { FileDownloadInfo, MediaPlayerProps, PlyrLayoutProps, LogLevel, TextTrackInit, PlyrLayoutTranslations, MediaPlayerState, MediaViewType, PlayerSrc, MediaEvents, MediaTextTrackChangeEvent, MediaControlsChangeEvent, MediaFullscreenChangeEvent, MediaRateChangeEvent, MediaCanPlayEvent, MediaTimeUpdateEvent, MediaVolumeChangeEvent } from '../types/vidstack-IH_rCrf6.js';
 import '../types/vidstack-BNOTL9fc.js';
 import { MediaPlayerElement, MediaProviderElement, MediaPlyrLayoutElement } from '../elements.js';
 import 'media-captions';
@@ -26,7 +26,7 @@ declare class Plyr implements PlyrProps, PlyrMethods {
     muted: boolean;
     loop: boolean;
     poster: string;
-    get type(): "" | "video" | "audio" | "google-cast" | "dash" | "hls" | "vimeo" | "youtube";
+    get type(): "" | "audio" | "video" | "google-cast" | "dash" | "hls" | "vimeo" | "youtube";
     get isHTML5(): boolean;
     get isEmbed(): boolean;
     get buffered(): number;

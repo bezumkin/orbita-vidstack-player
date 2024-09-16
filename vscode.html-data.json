@@ -402,7 +402,13 @@
               "name": "dblcompositionupdate"
             },
             {
+              "name": "dblcontextlost"
+            },
+            {
               "name": "dblcontextmenu"
+            },
+            {
+              "name": "dblcontextrestored"
             },
             {
               "name": "dblcopy"
@@ -1776,7 +1782,7 @@
         },
         {
           "name": "clip-start-time",
-          "description": "Limit playback to only play _after_ a certain time. Playback will being from this time.",
+          "description": "Limit playback to only play _after_ a certain time. Playback will begin from this time.",
           "references": []
         },
         {
@@ -1801,7 +1807,7 @@
         },
         {
           "name": "min-live-dvr-window",
-          "description": "The minimum seekable length in seconds before seeking operations are permitted.",
+          "description": "The minimum seekable length in seconds before seeking operations are permitted on live streams.",
           "references": []
         },
         {

@@ -1,6 +1,6 @@
 import '../types/vidstack-BNOTL9fc.js';
 import { MediaAudioLayoutElement, MediaVideoLayoutElement, MediaPlyrLayoutElement, MediaPlayerElement } from '../elements.js';
-import { DefaultLayoutProps, PlyrLayoutProps, MediaPlayerProps, TextTrackInit } from '../types/vidstack-DdBJnM5A.js';
+import { DefaultLayoutProps, PlyrLayoutProps, MediaPlayerProps, TextTrackInit } from '../types/vidstack-IH_rCrf6.js';
 import 'lit-html';
 import 'media-captions';
 import 'dashjs';

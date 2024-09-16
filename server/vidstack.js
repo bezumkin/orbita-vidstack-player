@@ -1,7 +1,7 @@
 import { DOMEvent, EventsTarget, fscreen, ViewController, EventsController, onDispose, signal, listenEvent, peek, isString, isNumber, createContext, useContext, Component, functionThrottle, isDOMNode, isFunction, setAttribute, isKeyboardClick, isTouchEvent, setStyle, effect, untrack, functionDebounce, isArray, isKeyboardEvent, deferredPromise, isUndefined, prop, method, provideContext, animationFrameThrottle, uppercaseFirstChar, camelToKebabCase, computed, tick, scoped, noop, State, isNull, ariaBool as ariaBool$1, isWriteSignal, hasProvidedContext, isObject, useState, createScope, r, wasEnterKeyPressed, isPointerEvent, isMouseEvent, kebabToCamelCase, createDisposalBin } from './chunks/vidstack-1-opvwuv.js';
 export { appendTriggerEvent, findTriggerEvent, hasTriggerEvent, walkTriggerEventChain } from './chunks/vidstack-1-opvwuv.js';
-import { canOrientScreen, isTrackCaptionKind, TextTrackSymbol, TextTrack, isAudioSrc, isVideoSrc, isHLSSupported, isHLSSrc, isDASHSupported, isDASHSrc, preconnect, IS_CHROME, canChangeVolume, softResetMediaState, getTimeRangesEnd, updateTimeIntervals, TimeRange, mediaState, getRequestCredentials, watchActiveTextTrack, isCueActive } from './chunks/vidstack-DZ1_TGF9.js';
-export { AUDIO_EXTENSIONS, AUDIO_TYPES, DASH_VIDEO_EXTENSIONS, DASH_VIDEO_TYPES, HLS_VIDEO_EXTENSIONS, HLS_VIDEO_TYPES, VIDEO_EXTENSIONS, VIDEO_TYPES, canGoogleCastSrc, canPlayHLSNatively, canRotateScreen, canUsePictureInPicture, canUseVideoPresentation, findActiveCue, getDownloadFile, getTimeRangesStart, isMediaStream, normalizeTimeIntervals, parseJSONCaptionsFile, watchCueTextChange } from './chunks/vidstack-DZ1_TGF9.js';
+import { canOrientScreen, isTrackCaptionKind, TextTrackSymbol, TextTrack, isAudioSrc, isVideoSrc, isHLSSupported, isHLSSrc, isDASHSupported, isDASHSrc, preconnect, boundTime, IS_CHROME, canChangeVolume, softResetMediaState, getTimeRangesEnd, updateTimeIntervals, TimeRange, mediaState, getRequestCredentials, watchActiveTextTrack, isCueActive } from './chunks/vidstack-ffopCUPo.js';
+export { AUDIO_EXTENSIONS, AUDIO_TYPES, DASH_VIDEO_EXTENSIONS, DASH_VIDEO_TYPES, HLS_VIDEO_EXTENSIONS, HLS_VIDEO_TYPES, VIDEO_EXTENSIONS, VIDEO_TYPES, canGoogleCastSrc, canPlayHLSNatively, canRotateScreen, canUsePictureInPicture, canUseVideoPresentation, findActiveCue, getDownloadFile, getTimeRangesStart, isMediaStream, normalizeTimeIntervals, parseJSONCaptionsFile, watchCueTextChange } from './chunks/vidstack-ffopCUPo.js';
 import { autoUpdate, computePosition, flip, shift } from '@floating-ui/dom';
 
 const GROUPED_LOG = Symbol(0);
@@ -911,6 +911,109 @@ class LocalMediaStorage {
   }
 }
 
+const SELECTED = Symbol(0);
+class SelectList extends List {
+  get selected() {
+    return this.items.find((item) => item.selected) ?? null;
+  }
+  get selectedIndex() {
+    return this.items.findIndex((item) => item.selected);
+  }
+  /** @internal */
+  [ListSymbol.onRemove](item, trigger) {
+    this[ListSymbol.select](item, false, trigger);
+  }
+  /** @internal */
+  [ListSymbol.add](item, trigger) {
+    item[SELECTED] = false;
+    Object.defineProperty(item, "selected", {
+      get() {
+        return this[SELECTED];
+      },
+      set: (selected) => {
+        if (this.readonly) return;
+        this[ListSymbol.onUserSelect]?.();
+        this[ListSymbol.select](item, selected);
+      }
+    });
+    super[ListSymbol.add](item, trigger);
+  }
+  /** @internal */
+  [ListSymbol.select](item, selected, trigger) {
+    if (selected === item?.[SELECTED]) return;
+    const prev = this.selected;
+    if (item) item[SELECTED] = selected;
+    const changed = !selected ? prev === item : prev !== item;
+    if (changed) {
+      if (prev) prev[SELECTED] = false;
+      this.dispatchEvent(
+        new DOMEvent("change", {
+          detail: {
+            prev,
+            current: this.selected
+          },
+          trigger
+        })
+      );
+    }
+  }
+}
+
+class AudioTrackList extends SelectList {
+}
+
+class LibASSTextRenderer {
+  constructor(loader, config) {
+    this.loader = loader;
+    this.config = config;
+  }
+  priority = 1;
+  #instance = null;
+  #track = null;
+  #typeRE = /(ssa|ass)$/;
+  canRender(track, video) {
+    return !!video && !!track.src && (isString(track.type) && this.#typeRE.test(track.type) || this.#typeRE.test(track.src));
+  }
+  attach(video) {
+    if (!video) return;
+    this.loader().then(async (mod) => {
+      this.#instance = new mod.default({
+        ...this.config,
+        video,
+        subUrl: this.#track?.src || ""
+      });
+      new EventsController(this.#instance).add("ready", () => {
+        const canvas = this.#instance?._canvas;
+        if (canvas) canvas.style.pointerEvents = "none";
+      }).add("error", (event) => {
+        if (!this.#track) return;
+        this.#track[TextTrackSymbol.readyState] = 3;
+        this.#track.dispatchEvent(
+          new DOMEvent("error", {
+            trigger: event,
+            detail: event.error
+          })
+        );
+      });
+    });
+  }
+  changeTrack(track) {
+    if (!track || track.readyState === 3) {
+      this.#freeTrack();
+    } else if (this.#track !== track) {
+      this.#instance?.setTrackByUrl(track.src);
+      this.#track = track;
+    }
+  }
+  detach() {
+    this.#freeTrack();
+  }
+  #freeTrack() {
+    this.#instance?.freeTrack();
+    this.#track = null;
+  }
+}
+
 function round(num, decimalPlaces = 2) {
   return Number(num.toFixed(decimalPlaces));
 }
@@ -1192,58 +1295,6 @@ class TextRenderers {
   }
 }
 
-class LibASSTextRenderer {
-  constructor(loader, config) {
-    this.loader = loader;
-    this.config = config;
-  }
-  priority = 1;
-  #instance = null;
-  #track = null;
-  #typeRE = /(ssa|ass)$/;
-  canRender(track, video) {
-    return !!video && !!track.src && (isString(track.type) && this.#typeRE.test(track.type) || this.#typeRE.test(track.src));
-  }
-  attach(video) {
-    if (!video) return;
-    this.loader().then(async (mod) => {
-      this.#instance = new mod.default({
-        ...this.config,
-        video,
-        subUrl: this.#track?.src || ""
-      });
-      new EventsController(this.#instance).add("ready", () => {
-        const canvas = this.#instance?._canvas;
-        if (canvas) canvas.style.pointerEvents = "none";
-      }).add("error", (event) => {
-        if (!this.#track) return;
-        this.#track[TextTrackSymbol.readyState] = 3;
-        this.#track.dispatchEvent(
-          new DOMEvent("error", {
-            trigger: event,
-            detail: event.error
-          })
-        );
-      });
-    });
-  }
-  changeTrack(track) {
-    if (!track || track.readyState === 3) {
-      this.#freeTrack();
-    } else if (this.#track !== track) {
-      this.#instance?.setTrackByUrl(track.src);
-      this.#track = track;
-    }
-  }
-  detach() {
-    this.#freeTrack();
-  }
-  #freeTrack() {
-    this.#instance?.freeTrack();
-    this.#track = null;
-  }
-}
-
 class TextTrackList extends List {
   #canLoad = false;
   #defaults = {};
@@ -1365,57 +1416,6 @@ class TextTrackList extends List {
   setStorage(storage) {
     this.#storage = storage;
   }
-}
-
-const SELECTED = Symbol(0);
-class SelectList extends List {
-  get selected() {
-    return this.items.find((item) => item.selected) ?? null;
-  }
-  get selectedIndex() {
-    return this.items.findIndex((item) => item.selected);
-  }
-  /** @internal */
-  [ListSymbol.onRemove](item, trigger) {
-    this[ListSymbol.select](item, false, trigger);
-  }
-  /** @internal */
-  [ListSymbol.add](item, trigger) {
-    item[SELECTED] = false;
-    Object.defineProperty(item, "selected", {
-      get() {
-        return this[SELECTED];
-      },
-      set: (selected) => {
-        if (this.readonly) return;
-        this[ListSymbol.onUserSelect]?.();
-        this[ListSymbol.select](item, selected);
-      }
-    });
-    super[ListSymbol.add](item, trigger);
-  }
-  /** @internal */
-  [ListSymbol.select](item, selected, trigger) {
-    if (selected === item?.[SELECTED]) return;
-    const prev = this.selected;
-    if (item) item[SELECTED] = selected;
-    const changed = !selected ? prev === item : prev !== item;
-    if (changed) {
-      if (prev) prev[SELECTED] = false;
-      this.dispatchEvent(
-        new DOMEvent("change", {
-          detail: {
-            prev,
-            current: this.selected
-          },
-          trigger
-        })
-      );
-    }
-  }
-}
-
-class AudioTrackList extends SelectList {
 }
 
 const SET_AUTO = Symbol(0), ENABLE_AUTO = Symbol(0);
@@ -2519,7 +2519,7 @@ class MediaRequestManager extends MediaPlayerController {
       }
       preconnect("https://www.gstatic.com");
       if (!this.#googleCastLoader) {
-        const $module = await import('./chunks/vidstack-DfVtqhrg.js');
+        const $module = await import('./chunks/vidstack-BIlI0d8S.js');
         this.#googleCastLoader = new $module.GoogleCastLoader();
       }
       await this.#googleCastLoader.prompt(this.#media);
@@ -2734,16 +2734,16 @@ class MediaRequestManager extends MediaPlayerController {
     this.controls.resume(event);
   }
   ["media-seek-request"](event) {
-    const { seekableStart, seekableEnd, ended, canSeek, live, userBehindLiveEdge, clipStartTime } = this.$state, seekTime = event.detail;
+    const { canSeek, ended, live, seekableEnd, userBehindLiveEdge } = this.$state, seekTime = event.detail;
     if (ended()) this.#request.replaying = true;
     const key = event.type;
     this.#request.seeking = false;
     this.#request.queue.delete(key);
-    const clippedTime = seekTime + clipStartTime(), isStart = Math.floor(seekTime) === Math.floor(seekableStart()), isEnd = Math.floor(clippedTime) === Math.floor(seekableEnd()), boundTime = isStart ? seekableStart() : isEnd ? seekableEnd() : Math.min(Math.max(seekableStart() + 0.1, clippedTime), seekableEnd() - 0.1);
-    if (!Number.isFinite(boundTime) || !canSeek()) return;
+    const boundedTime = boundTime(seekTime, this.$state);
+    if (!Number.isFinite(boundedTime) || !canSeek()) return;
     this.#request.queue.enqueue(key, event);
-    this.#$provider().setCurrentTime(boundTime);
-    if (live() && event.isOriginTrusted && Math.abs(seekableEnd() - boundTime) >= 2) {
+    this.#$provider().setCurrentTime(boundedTime);
+    if (live() && event.isOriginTrusted && Math.abs(seekableEnd() - boundedTime) >= 2) {
       userBehindLiveEdge.set(true);
     }
   }
@@ -3180,19 +3180,12 @@ class MediaStateManager extends MediaPlayerController {
     }
   }
   ["progress"](event) {
-    const { buffered, bufferedEnd, seekable, seekableEnd, live, intrinsicDuration } = this.$state, { buffered: newBuffered, seekable: newSeekable } = event.detail, newBufferedEnd = getTimeRangesEnd(newBuffered) ?? Infinity, hasBufferedLengthChanged = newBuffered.length !== buffered().length, hasBufferedEndChanged = newBufferedEnd > bufferedEnd(), newSeekableEnd = getTimeRangesEnd(newSeekable) ?? Infinity, hasSeekableLengthChanged = newSeekable.length !== seekable().length, hasSeekableEndChanged = newSeekableEnd > seekableEnd();
+    const { buffered, seekable } = this.$state, { buffered: newBuffered, seekable: newSeekable } = event.detail, newBufferedEnd = getTimeRangesEnd(newBuffered), hasBufferedLengthChanged = newBuffered.length !== buffered().length, hasBufferedEndChanged = newBufferedEnd !== getTimeRangesEnd(buffered()), newSeekableEnd = getTimeRangesEnd(newSeekable), hasSeekableLengthChanged = newSeekable.length !== seekable().length, hasSeekableEndChanged = newSeekableEnd !== getTimeRangesEnd(seekable());
     if (hasBufferedLengthChanged || hasBufferedEndChanged) {
       buffered.set(newBuffered);
     }
     if (hasSeekableLengthChanged || hasSeekableEndChanged) {
       seekable.set(newSeekable);
-    }
-    if (live()) {
-      intrinsicDuration.set(newSeekableEnd);
-      this.dispatch("duration-change", {
-        detail: newSeekableEnd,
-        trigger: event
-      });
     }
   }
   ["play"](event) {
@@ -3244,16 +3237,8 @@ class MediaStateManager extends MediaPlayerController {
   #resetPlaybackIfNeeded(trigger) {
     const provider = peek(this.#media.$provider);
     if (!provider) return;
-    const {
-      ended,
-      seekableStart,
-      clipStartTime,
-      clipEndTime,
-      currentTime,
-      realCurrentTime,
-      duration
-    } = this.$state;
-    const shouldReset = ended() || realCurrentTime() < clipStartTime() || clipEndTime() > 0 && realCurrentTime() >= clipEndTime() || Math.abs(currentTime() - duration()) < 0.1;
+    const { ended, seekableStart, clipEndTime, currentTime, realCurrentTime, duration } = this.$state;
+    const shouldReset = ended() || realCurrentTime() < seekableStart() || clipEndTime() > 0 && realCurrentTime() >= clipEndTime() || Math.abs(currentTime() - duration()) < 0.1;
     if (shouldReset) {
       this.dispatch("media-seek-request", {
         detail: seekableStart(),
@@ -3422,7 +3407,7 @@ class MediaStateManager extends MediaPlayerController {
     { leading: true }
   );
   ["seeked"](event) {
-    const { seeking, currentTime, realCurrentTime, paused, seekableEnd, ended } = this.$state;
+    const { seeking, currentTime, realCurrentTime, paused, seekableEnd, ended, live } = this.$state;
     if (this.#request.seeking) {
       seeking.set(true);
       event.stopImmediatePropagation();
@@ -3442,10 +3427,12 @@ class MediaStateManager extends MediaPlayerController {
         this["started"](event);
       }
     }
-    if (Math.floor(currentTime()) !== Math.floor(seekableEnd())) {
-      ended.set(false);
-    } else {
-      this.end(event);
+    if (!live()) {
+      if (Math.floor(currentTime()) !== Math.floor(seekableEnd())) {
+        ended.set(false);
+      } else {
+        this.end(event);
+      }
     }
   }
   ["waiting"](event) {
@@ -4022,13 +4009,13 @@ class MediaPlayer extends Component {
   }
   #queueCurrentTimeUpdate(time) {
     this.canPlayQueue.enqueue("currentTime", () => {
-      const { currentTime, clipStartTime, seekableStart, seekableEnd } = this.$state;
+      const { currentTime } = this.$state;
       if (time === peek(currentTime)) return;
       peek(() => {
         if (!this.#provider) return;
-        const clippedTime = time + clipStartTime(), isStart = Math.floor(time) === Math.floor(seekableStart()), isEnd = Math.floor(clippedTime) === Math.floor(seekableEnd()), boundTime = isStart ? seekableStart() : isEnd ? seekableEnd() : Math.min(Math.max(seekableStart() + 0.1, clippedTime), seekableEnd() - 0.1);
-        if (Number.isFinite(boundTime)) {
-          this.#provider.setCurrentTime(boundTime);
+        const boundedTime = boundTime(time, this.$state);
+        if (Number.isFinite(boundedTime)) {
+          this.#provider.setCurrentTime(boundedTime);
         }
       });
     });
@@ -5622,9 +5609,9 @@ class SliderEventsController extends ViewController {
   }
   #attachEventListeners(el) {
     const { hidden } = this.$props;
-    new EventsController(el).add("focus", this.#onFocus.bind(this)).add("keyup", this.#onKeyUp.bind(this)).add("keydown", this.#onKeyDown.bind(this));
+    listenEvent(el, "focus", this.#onFocus.bind(this));
     if (hidden() || this.#delegate.isDisabled()) return;
-    new EventsController(el).add("pointerenter", this.#onPointerEnter.bind(this)).add("pointermove", this.#onPointerMove.bind(this)).add("pointerleave", this.#onPointerLeave.bind(this)).add("pointerdown", this.#onPointerDown.bind(this));
+    new EventsController(el).add("keyup", this.#onKeyUp.bind(this)).add("keydown", this.#onKeyDown.bind(this)).add("pointerenter", this.#onPointerEnter.bind(this)).add("pointermove", this.#onPointerMove.bind(this)).add("pointerleave", this.#onPointerLeave.bind(this)).add("pointerdown", this.#onPointerDown.bind(this));
   }
   #attachPointerListeners(el) {
     if (this.#delegate.isDisabled() || !this.$state.dragging()) return;
@@ -7058,7 +7045,7 @@ class SliderChapters extends Component {
   #watchContainerWidths() {
     const cues = this.#$cues();
     if (!cues.length) return;
-    let cue, { clipStartTime, clipEndTime } = this.#media.$state, startTime = clipStartTime(), endTime = clipEndTime() || cues[cues.length - 1].endTime, duration = endTime - startTime, remainingWidth = 100;
+    let cue, { seekableStart, seekableEnd } = this.#media.$state, startTime = seekableStart(), endTime = seekableEnd() || cues[cues.length - 1].endTime, duration = endTime - startTime, remainingWidth = 100;
     for (let i = 0; i < cues.length; i++) {
       cue = cues[i];
       if (this.#refs[i]) {
@@ -7069,9 +7056,9 @@ class SliderChapters extends Component {
     }
   }
   #watchFillPercent() {
-    let { liveEdge, clipStartTime, duration } = this.#media.$state, { fillPercent, value } = this.#sliderState, cues = this.#$cues(), isLiveEdge = liveEdge(), prevActiveIndex = peek(this.#activeIndex), currentChapter = cues[prevActiveIndex];
+    let { liveEdge, seekableStart, seekableEnd } = this.#media.$state, { fillPercent, value } = this.#sliderState, cues = this.#$cues(), isLiveEdge = liveEdge(), prevActiveIndex = peek(this.#activeIndex), currentChapter = cues[prevActiveIndex];
     let currentActiveIndex = isLiveEdge ? this.#$cues.length - 1 : this.#findActiveChapterIndex(
-      currentChapter ? currentChapter.startTime / duration() * 100 <= peek(value) ? prevActiveIndex : 0 : 0,
+      currentChapter ? currentChapter.startTime / seekableEnd() * 100 <= peek(value) ? prevActiveIndex : 0 : 0,
       fillPercent()
     );
     if (isLiveEdge || !currentChapter) {
@@ -7084,7 +7071,7 @@ class SliderChapters extends Component {
     const percent = isLiveEdge ? 100 : this.#calcPercent(
       cues[currentActiveIndex],
       fillPercent(),
-      clipStartTime(),
+      seekableStart(),
       this.#getEndTime(cues)
     );
     this.#updateFillPercent(this.#refs[currentActiveIndex], percent);
@@ -7112,7 +7099,7 @@ class SliderChapters extends Component {
     let chapterPercent = 0, cues = this.#$cues();
     if (percent === 0) return 0;
     else if (percent === 100) return cues.length - 1;
-    let { clipStartTime } = this.#media.$state, startTime = clipStartTime(), endTime = this.#getEndTime(cues);
+    let { seekableStart } = this.#media.$state, startTime = seekableStart(), endTime = this.#getEndTime(cues);
     for (let i = startIndex; i < cues.length; i++) {
       chapterPercent = this.#calcPercent(cues[i], percent, startTime, endTime);
       if (chapterPercent >= 0 && chapterPercent < 100) return i;
@@ -7129,10 +7116,11 @@ class SliderChapters extends Component {
     return round(Math.min(bufferedEnd() / Math.max(duration(), 1), 1), 3) * 100;
   }
   #getEndTime(cues) {
-    const { clipEndTime } = this.#media.$state, endTime = clipEndTime();
-    return endTime > 0 ? endTime : cues[cues.length - 1]?.endTime || 0;
+    const { seekableEnd } = this.#media.$state, endTime = seekableEnd();
+    return Number.isFinite(endTime) ? endTime : cues[cues.length - 1]?.endTime || 0;
   }
   #calcPercent(cue, percent, startTime, endTime) {
+    if (!cue) return 0;
     const cues = this.#$cues();
     if (cues.length === 0) return 0;
     const duration = endTime - startTime, cueStartTime = Math.max(0, cue.startTime - startTime), cueEndTime = Math.min(endTime, cue.endTime) - startTime;
@@ -7146,7 +7134,7 @@ class SliderChapters extends Component {
     );
   }
   #fillGaps(cues) {
-    let chapters = [], { clipStartTime, clipEndTime, duration } = this.#media.$state, startTime = clipStartTime(), endTime = clipEndTime() || Infinity;
+    let chapters = [], { seekableStart, seekableEnd, duration } = this.#media.$state, startTime = seekableStart(), endTime = seekableEnd();
     cues = cues.filter((cue) => cue.startTime <= endTime && cue.endTime >= startTime);
     const firstCue = cues[0];
     if (firstCue && firstCue.startTime > startTime) {
@@ -8188,7 +8176,7 @@ class ChaptersRadioGroup extends Component {
     });
   }
   getOptions() {
-    const { clipStartTime, clipEndTime } = this.#media.$state, startTime = clipStartTime(), endTime = clipEndTime() || Infinity;
+    const { seekableStart, seekableEnd } = this.#media.$state, startTime = seekableStart(), endTime = seekableEnd();
     return this.#cues().map((cue, i) => ({
       cue,
       value: i.toString(),
@@ -8219,7 +8207,7 @@ class ChaptersRadioGroup extends Component {
     };
   }
   #onCuesChange(track) {
-    const { clipStartTime, clipEndTime } = this.#media.$state, startTime = clipStartTime(), endTime = clipEndTime() || Infinity;
+    const { seekableStart, seekableEnd } = this.#media.$state, startTime = seekableStart(), endTime = seekableEnd();
     this.#cues.set(
       [...track.cues].filter((cue) => cue.startTime <= endTime && cue.endTime >= startTime)
     );
@@ -8231,7 +8219,7 @@ class ChaptersRadioGroup extends Component {
       this.#controller.value = "-1";
       return;
     }
-    const { realCurrentTime, clipStartTime, clipEndTime } = this.#media.$state, startTime = clipStartTime(), endTime = clipEndTime() || Infinity, time = realCurrentTime(), activeCueIndex = this.#cues().findIndex((cue) => isCueActive(cue, time));
+    const { realCurrentTime, seekableStart, seekableEnd } = this.#media.$state, startTime = seekableStart(), endTime = seekableEnd(), time = realCurrentTime(), activeCueIndex = this.#cues().findIndex((cue) => isCueActive(cue, time));
     this.#controller.value = activeCueIndex.toString();
     if (activeCueIndex >= 0) {
       requestScopedAnimationFrame(() => {
@@ -9212,4 +9200,4 @@ function isHTMLProvider(type) {
   return type === "audio" || type === "video";
 }
 
-export { ARIAKeyShortcuts, AirPlayButton, AudioGainRadioGroup, AudioGainSlider, AudioProviderLoader, AudioRadioGroup, AudioTrackList, CaptionButton, Captions, CaptionsRadioGroup, ChaptersRadioGroup, Controls, ControlsGroup, DASHProviderLoader, DEFAULT_AUDIO_GAINS, DEFAULT_PLAYBACK_RATES, FullscreenButton, FullscreenController, Gesture, GoogleCastButton, HLSProviderLoader, LibASSTextRenderer, List, LiveButton, LocalMediaStorage, Logger, MEDIA_KEY_SHORTCUTS, MediaAnnouncer, MediaControls, MediaPlayer, MediaProvider, MediaRemoteControl, Menu, MenuButton, MenuItem, MenuItems, MenuPortal, MuteButton, PIPButton, PlayButton, Poster, QualityRadioGroup, QualitySlider, Radio, RadioGroup, ScreenOrientationController, SeekButton, Slider, SliderChapters, SliderController, SliderPreview, SliderThumbnail, SliderValue, SliderVideo, SpeedRadioGroup, SpeedSlider, TextRenderers, TextTrack, TextTrackList, Thumbnail, ThumbnailsLoader, Time, TimeRange, TimeSlider, ToggleButton, Tooltip, TooltipContent, TooltipTrigger, VideoProviderLoader, VideoQualityList, VimeoProviderLoader, VolumeSlider, YouTubeProviderLoader, canChangeVolume, canFullscreen, canOrientScreen, formatSpokenTime, formatTime, getTimeRangesEnd, isAudioProvider, isAudioSrc, isCueActive, isDASHProvider, isDASHSrc, isGoogleCastProvider, isHLSProvider, isHLSSrc, isHTMLAudioElement, isHTMLIFrameElement, isHTMLMediaElement, isHTMLVideoElement, isKeyboardClick, isKeyboardEvent, isPointerEvent, isTrackCaptionKind, isVideoProvider, isVideoQualitySrc, isVideoSrc, isVimeoProvider, isYouTubeProvider, mediaContext, mediaState, menuPortalContext, sliderContext, sliderState, softResetMediaState, sortVideoQualities, updateSliderPreviewPlacement, updateTimeIntervals, usePlyrLayoutClasses, watchActiveTextTrack };
+export { ARIAKeyShortcuts, AirPlayButton, AudioGainRadioGroup, AudioGainSlider, AudioProviderLoader, AudioRadioGroup, AudioTrackList, CaptionButton, Captions, CaptionsRadioGroup, ChaptersRadioGroup, Controls, ControlsGroup, DASHProviderLoader, DEFAULT_AUDIO_GAINS, DEFAULT_PLAYBACK_RATES, FullscreenButton, FullscreenController, Gesture, GoogleCastButton, HLSProviderLoader, LibASSTextRenderer, List, LiveButton, LocalMediaStorage, Logger, MEDIA_KEY_SHORTCUTS, MediaAnnouncer, MediaControls, MediaPlayer, MediaProvider, MediaRemoteControl, Menu, MenuButton, MenuItem, MenuItems, MenuPortal, MuteButton, PIPButton, PlayButton, Poster, QualityRadioGroup, QualitySlider, Radio, RadioGroup, ScreenOrientationController, SeekButton, Slider, SliderChapters, SliderController, SliderPreview, SliderThumbnail, SliderValue, SliderVideo, SpeedRadioGroup, SpeedSlider, TextRenderers, TextTrack, TextTrackList, Thumbnail, ThumbnailsLoader, Time, TimeRange, TimeSlider, ToggleButton, Tooltip, TooltipContent, TooltipTrigger, VideoProviderLoader, VideoQualityList, VimeoProviderLoader, VolumeSlider, YouTubeProviderLoader, boundTime, canChangeVolume, canFullscreen, canOrientScreen, formatSpokenTime, formatTime, getTimeRangesEnd, isAudioProvider, isAudioSrc, isCueActive, isDASHProvider, isDASHSrc, isGoogleCastProvider, isHLSProvider, isHLSSrc, isHTMLAudioElement, isHTMLIFrameElement, isHTMLMediaElement, isHTMLVideoElement, isKeyboardClick, isKeyboardEvent, isPointerEvent, isTrackCaptionKind, isVideoProvider, isVideoQualitySrc, isVideoSrc, isVimeoProvider, isYouTubeProvider, mediaContext, mediaState, menuPortalContext, sliderContext, sliderState, softResetMediaState, sortVideoQualities, updateSliderPreviewPlacement, updateTimeIntervals, usePlyrLayoutClasses, watchActiveTextTrack };

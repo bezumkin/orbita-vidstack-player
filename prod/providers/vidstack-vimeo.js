@@ -1,14 +1,14 @@
 import { createScope, signal, effect, peek, isString, deferredPromise, listenEvent, isArray } from '../chunks/vidstack-CRlI3Mh7.js';
 import { QualitySymbol } from '../chunks/vidstack-B01xzxC4.js';
 import { TimeRange } from '../chunks/vidstack-BmMUBVGQ.js';
-import { TextTrack } from '../chunks/vidstack-B5628Ni3.js';
+import { TextTrack } from '../chunks/vidstack-oyBGi0R4.js';
 import { ListSymbol } from '../chunks/vidstack-D5EzK014.js';
 import { RAFLoop } from '../chunks/vidstack-DSYpsFWk.js';
-import { preconnect } from '../chunks/vidstack-vDnjyKV8.js';
-import { EmbedProvider } from '../chunks/vidstack-BSPPDWLF.js';
+import { preconnect } from '../chunks/vidstack-A9j--j6J.js';
+import { EmbedProvider } from '../chunks/vidstack-BePVaxm4.js';
 import { resolveVimeoVideoId, getVimeoVideoInfo } from '../chunks/vidstack-krOAtKMi.js';
 import '../chunks/vidstack-DE4XvkHU.js';
-import '../chunks/vidstack-DyMkFGuS.js';
+import '../chunks/vidstack-DwhHIY5e.js';
 
 const trackedVimeoEvents = [
   "bufferend",
@@ -224,7 +224,7 @@ class VimeoProvider extends EmbedProvider {
   #preventTimeUpdates = false;
   #onTimeUpdate(time, trigger) {
     if (this.#preventTimeUpdates && time === 0) return;
-    const { realCurrentTime, realDuration, paused, bufferedEnd } = this.#ctx.$state;
+    const { realCurrentTime, paused, bufferedEnd, seekableEnd, live } = this.#ctx.$state;
     if (realCurrentTime() === time) return;
     const prevTime = realCurrentTime();
     this.#ctx.notify("time-change", time, trigger);
@@ -234,7 +234,7 @@ class VimeoProvider extends EmbedProvider {
         this.#ctx.notify("waiting", void 0, trigger);
       }
     }
-    if (realDuration() - time < 0.01) {
+    if (!live() && seekableEnd() - time < 0.01) {
       this.#ctx.notify("end", void 0, trigger);
       this.#preventTimeUpdates = true;
       setTimeout(() => {
@@ -386,13 +386,13 @@ class VimeoProvider extends EmbedProvider {
     const track = new TextTrack({
       kind: "chapters",
       default: true
-    }), { realDuration } = this.#ctx.$state;
+    }), { seekableEnd } = this.#ctx.$state;
     for (let i = 0; i < chapters.length; i++) {
       const chapter = chapters[i], nextChapter = chapters[i + 1];
       track.addCue(
         new window.VTTCue(
           chapter.startTime,
-          nextChapter?.startTime ?? realDuration(),
+          nextChapter?.startTime ?? seekableEnd(),
           chapter.title
         )
       );

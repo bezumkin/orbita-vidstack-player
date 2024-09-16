@@ -1,7 +1,7 @@
 import { defineCustomElement } from '../chunks/vidstack-CRlI3Mh7.js';
 import { MediaAudioLayoutElement } from './templates/vidstack-audio-layout.js';
 import { MediaVideoLayoutElement } from './templates/vidstack-video-layout.js';
-import '../chunks/vidstack-3a3M51_S.js';
+import '../chunks/vidstack-C-w7D8wB.js';
 import '../chunks/vidstack-Cpte_fRf.js';
 import '../chunks/vidstack-Ds_q5BGO.js';
 import '@floating-ui/dom';
@@ -13,8 +13,8 @@ import 'lit-html/async-directive.js';
 import '../chunks/vidstack-DE4XvkHU.js';
 import '../chunks/vidstack-BOTZD4tC.js';
 import 'lit-html/directives/ref.js';
-import '../chunks/vidstack-vDnjyKV8.js';
-import '../chunks/vidstack-DyMkFGuS.js';
+import '../chunks/vidstack-A9j--j6J.js';
+import '../chunks/vidstack-DwhHIY5e.js';
 import '../chunks/vidstack-CwTj4H1w.js';
 import 'lit-html/directives/keyed.js';
 

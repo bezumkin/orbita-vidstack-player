@@ -1,15 +1,15 @@
 import { html } from 'lit-html';
-import { computed, signal, effect, listenEvent, peek, isKeyboardEvent, isKeyboardClick, Host, onDispose } from '../../chunks/vidstack-DVpy0IqK.js';
+import { computed, signal, effect, listenEvent, peek, isString, isKeyboardEvent, isKeyboardClick, Host, onDispose } from '../../chunks/vidstack-DVpy0IqK.js';
 import { usePlyrLayoutContext, usePlyrLayoutClasses, PlyrLayout } from '../../chunks/vidstack-CuDKkHai.js';
 import { useMediaContext } from '../../chunks/vidstack-CUYciP40.js';
 import { LayoutIconsLoader, Icon, $signal, SlotManager } from '../../chunks/vidstack-mJNGvZNe.js';
 import { LitElement } from '../../chunks/vidstack-CwTj4H1w.js';
 import { unsafeHTML } from 'lit-html/directives/unsafe-html.js';
-import { getDownloadFile } from '../../chunks/vidstack-BgIVvpNy.js';
+import { getDownloadFile, appendParamsToURL } from '../../chunks/vidstack-DCY5OwWc.js';
 import 'lit-html/directives/if-defined.js';
 import 'lit-html/directives/unsafe-svg.js';
 import 'lit-html/async-directive.js';
-import '../../chunks/vidstack-CrZuJYaH.js';
+import '../../chunks/vidstack-uKxEd7nI.js';
 
 class PlyrLayoutIconsLoader extends LayoutIconsLoader {
   async loadIcons() {
@@ -381,10 +381,10 @@ function DownloadButton() {
       src: $src,
       download: $download
     }), $downloadText = $i18n(translations, "Download");
-    return file ? html`
+    return isString(file?.url) ? html`
           <a
             class="plyr__controls__item plyr__control"
-            href=${file.url + `?download=${file.name}`}
+            href=${appendParamsToURL(file.url, { download: file.name })}
             download=${file.name}
             target="_blank"
           >

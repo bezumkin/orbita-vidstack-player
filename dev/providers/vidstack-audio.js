@@ -1,7 +1,7 @@
 import { scoped } from '../chunks/vidstack-DVpy0IqK.js';
 import { HTMLMediaProvider } from './vidstack-html.js';
-import { HTMLAirPlayAdapter } from '../chunks/vidstack-DBlvh7ra.js';
-import '../chunks/vidstack-CrZuJYaH.js';
+import { HTMLAirPlayAdapter } from '../chunks/vidstack-clMv7kJL.js';
+import '../chunks/vidstack-uKxEd7nI.js';
 import '../chunks/vidstack-HSkhaVtP.js';
 import '../chunks/vidstack-Dihypf8P.js';
 import '../chunks/vidstack-Dv_LIPFu.js';

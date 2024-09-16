@@ -1,4 +1,4 @@
-import { IS_SAFARI, IS_IOS, isHLSSrc, isMediaStream } from '../chunks/vidstack-DyMkFGuS.js';
+import { IS_SAFARI, IS_IOS, isHLSSrc, isMediaStream } from '../chunks/vidstack-DwhHIY5e.js';
 import { signal, EventsController, effect, onDispose, peek, isNil, listenEvent, DOMEvent, createScope, setAttribute, isString } from '../chunks/vidstack-CRlI3Mh7.js';
 import { RAFLoop } from '../chunks/vidstack-DSYpsFWk.js';
 import { getNumberOfDecimalPlaces } from '../chunks/vidstack-Dihypf8P.js';

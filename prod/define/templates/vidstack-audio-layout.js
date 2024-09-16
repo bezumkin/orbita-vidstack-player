@@ -1,5 +1,5 @@
 import { signal, effect, toggleClass, Host, listenEvent } from '../../chunks/vidstack-CRlI3Mh7.js';
-import { DefaultLayout, DefaultAnnouncer, DefaultCaptions, DefaultSeekButton, DefaultPlayButton, DefaultTimeSlider, DefaultTimeInvert, DefaultVolumePopup, DefaultCaptionButton, DefaultDownloadButton, DefaultAirPlayButton, DefaultChaptersMenu, DefaultSettingsMenu, useDefaultLayoutContext, DefaultControlsSpacer, i18n, DefaultChapterTitle, setLayoutName, createMenuContainer, DefaultLayoutIconsLoader } from '../../chunks/vidstack-3a3M51_S.js';
+import { DefaultLayout, DefaultAnnouncer, DefaultCaptions, DefaultSeekButton, DefaultPlayButton, DefaultTimeSlider, DefaultTimeInvert, DefaultVolumePopup, DefaultCaptionButton, DefaultDownloadButton, DefaultAirPlayButton, DefaultChaptersMenu, DefaultSettingsMenu, useDefaultLayoutContext, DefaultControlsSpacer, i18n, DefaultChapterTitle, setLayoutName, createMenuContainer, DefaultLayoutIconsLoader } from '../../chunks/vidstack-C-w7D8wB.js';
 import { useMediaContext, useMediaState } from '../../chunks/vidstack-Cpte_fRf.js';
 import { useTransitionActive, useResizeObserver, isHTMLElement } from '../../chunks/vidstack-Ds_q5BGO.js';
 import { $signal, SlotManager } from '../../chunks/vidstack-7xep0lg7.js';
@@ -9,8 +9,8 @@ import { ref } from 'lit-html/directives/ref.js';
 import '../../chunks/vidstack-DE4XvkHU.js';
 import '../../chunks/vidstack-BOTZD4tC.js';
 import 'lit-html/directives/if-defined.js';
-import '../../chunks/vidstack-vDnjyKV8.js';
-import '../../chunks/vidstack-DyMkFGuS.js';
+import '../../chunks/vidstack-A9j--j6J.js';
+import '../../chunks/vidstack-DwhHIY5e.js';
 import '@floating-ui/dom';
 import 'lit-html/directives/unsafe-svg.js';
 import 'lit-html/async-directive.js';

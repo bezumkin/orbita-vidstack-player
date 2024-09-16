@@ -1,5 +1,5 @@
 import { isString, setStyle, createDisposalBin, isBoolean, DOMEvent } from '../chunks/vidstack-1-opvwuv.js';
-import { mediaState, canPlayVideoType } from '../chunks/vidstack-DZ1_TGF9.js';
+import { mediaState, canPlayVideoType } from '../chunks/vidstack-ffopCUPo.js';
 import '@floating-ui/dom';
 
 let activePlyr = null, defaults = mediaState.record, eventMap = {

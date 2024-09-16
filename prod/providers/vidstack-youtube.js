@@ -1,9 +1,9 @@
 import { createScope, signal, effect, isString, deferredPromise, isObject, isNumber, isBoolean } from '../chunks/vidstack-CRlI3Mh7.js';
 import { TimeRange } from '../chunks/vidstack-BmMUBVGQ.js';
-import { preconnect } from '../chunks/vidstack-vDnjyKV8.js';
-import { EmbedProvider } from '../chunks/vidstack-BSPPDWLF.js';
+import { preconnect } from '../chunks/vidstack-A9j--j6J.js';
+import { EmbedProvider } from '../chunks/vidstack-BePVaxm4.js';
 import { resolveYouTubeVideoId } from '../chunks/vidstack-Zc3I7oOd.js';
-import '../chunks/vidstack-DyMkFGuS.js';
+import '../chunks/vidstack-DwhHIY5e.js';
 
 const YouTubePlayerState = {
   Unstarted: -1,
