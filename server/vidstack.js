@@ -6243,6 +6243,7 @@ class Thumbnail extends Component {
     ), scale = !isNaN(maxRatio) && maxRatio < 1 ? maxRatio : minRatio > 1 ? minRatio : 1;
     this.#style(rootEl, "--thumbnail-width", `${width * scale}px`);
     this.#style(rootEl, "--thumbnail-height", `${height * scale}px`);
+    this.#style(rootEl, "--thumbnail-aspect-ratio", String(round(width / height, 5)));
     this.#style(imgEl, "width", `${imgEl.naturalWidth * scale}px`);
     this.#style(imgEl, "height", `${imgEl.naturalHeight * scale}px`);
     this.#style(

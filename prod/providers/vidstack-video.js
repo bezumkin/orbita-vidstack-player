@@ -2,12 +2,12 @@ import { onDispose, EventsController, listenEvent, DOMEvent, scoped } from '../c
 import { canUsePictureInPicture, canUseVideoPresentation, canPlayHLSNatively } from '../chunks/vidstack-DwhHIY5e.js';
 import { HTMLMediaProvider } from './vidstack-html.js';
 import { HTMLAirPlayAdapter } from '../chunks/vidstack-CGXAe0PE.js';
-import { TextTrack, TextTrackSymbol } from '../chunks/vidstack-oyBGi0R4.js';
+import { TextTrack, TextTrackSymbol } from '../chunks/vidstack-CP9ACpRU.js';
 import '../chunks/vidstack-DSYpsFWk.js';
 import '../chunks/vidstack-Dihypf8P.js';
 import '../chunks/vidstack-D5EzK014.js';
 import '../chunks/vidstack-A9j--j6J.js';
-import '../chunks/vidstack-DE4XvkHU.js';
+import '../chunks/vidstack-lwuXewh7.js';
 
 class NativeHLSTextTracks {
   #video;

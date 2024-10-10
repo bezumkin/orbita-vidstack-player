@@ -3,14 +3,14 @@ import { IS_CHROME, isHLSSupported } from '../chunks/vidstack-uKxEd7nI.js';
 import { VideoProvider } from './vidstack-video.js';
 import { peek, listenEvent, effect, DOMEvent, isString, camelToKebabCase, isUndefined, isFunction } from '../chunks/vidstack-DVpy0IqK.js';
 import { QualitySymbol } from '../chunks/vidstack-Bpr4fI4n.js';
-import { TextTrack, TextTrackSymbol } from '../chunks/vidstack-Dn8_b_Q6.js';
+import { TextTrack, TextTrackSymbol } from '../chunks/vidstack-nPuRR80r.js';
 import { ListSymbol } from '../chunks/vidstack-Dv_LIPFu.js';
 import { RAFLoop } from '../chunks/vidstack-HSkhaVtP.js';
 import { coerceToError } from '../chunks/vidstack-DbBJlz7I.js';
 import './vidstack-html.js';
 import '../chunks/vidstack-Dihypf8P.js';
 import '../chunks/vidstack-clMv7kJL.js';
-import '../chunks/vidstack-C1THCRTj.js';
+import '../chunks/vidstack-Cg9baIQC.js';
 
 const toDOMEventType = (type) => camelToKebabCase(type);
 class HLSController {

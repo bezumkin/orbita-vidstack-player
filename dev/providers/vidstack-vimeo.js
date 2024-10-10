@@ -1,13 +1,13 @@
 import { createScope, signal, effect, peek, isString, deferredPromise, listenEvent, isArray } from '../chunks/vidstack-DVpy0IqK.js';
 import { QualitySymbol } from '../chunks/vidstack-Bpr4fI4n.js';
 import { TimeRange } from '../chunks/vidstack-B5ElR9su.js';
-import { TextTrack } from '../chunks/vidstack-Dn8_b_Q6.js';
+import { TextTrack } from '../chunks/vidstack-nPuRR80r.js';
 import { ListSymbol } from '../chunks/vidstack-Dv_LIPFu.js';
 import { RAFLoop } from '../chunks/vidstack-HSkhaVtP.js';
 import { preconnect } from '../chunks/vidstack-DCY5OwWc.js';
 import { EmbedProvider } from '../chunks/vidstack-CQNXGlYn.js';
 import { resolveVimeoVideoId, getVimeoVideoInfo } from '../chunks/vidstack-krOAtKMi.js';
-import '../chunks/vidstack-C1THCRTj.js';
+import '../chunks/vidstack-Cg9baIQC.js';
 import '../chunks/vidstack-uKxEd7nI.js';
 
 const trackedVimeoEvents = [

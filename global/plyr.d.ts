@@ -26,7 +26,7 @@ declare class Plyr implements PlyrProps, PlyrMethods {
     muted: boolean;
     loop: boolean;
     poster: string;
-    get type(): "" | "audio" | "video" | "google-cast" | "dash" | "hls" | "vimeo" | "youtube";
+    get type(): "" | "video" | "audio" | "google-cast" | "dash" | "hls" | "vimeo" | "youtube";
     get isHTML5(): boolean;
     get isEmbed(): boolean;
     get buffered(): number;

@@ -3,14 +3,14 @@ import { canPlayVideoType, canPlayAudioType, IS_CHROME, isDASHSupported } from '
 import { VideoProvider } from './vidstack-video.js';
 import { listenEvent, effect, DOMEvent, isNumber, peek, isString, camelToKebabCase, isUndefined, isFunction } from '../chunks/vidstack-DVpy0IqK.js';
 import { QualitySymbol } from '../chunks/vidstack-Bpr4fI4n.js';
-import { TextTrackSymbol, TextTrack } from '../chunks/vidstack-Dn8_b_Q6.js';
+import { TextTrackSymbol, TextTrack } from '../chunks/vidstack-nPuRR80r.js';
 import { ListSymbol } from '../chunks/vidstack-Dv_LIPFu.js';
 import { RAFLoop } from '../chunks/vidstack-HSkhaVtP.js';
 import { coerceToError } from '../chunks/vidstack-DbBJlz7I.js';
 import './vidstack-html.js';
 import '../chunks/vidstack-Dihypf8P.js';
 import '../chunks/vidstack-clMv7kJL.js';
-import '../chunks/vidstack-C1THCRTj.js';
+import '../chunks/vidstack-Cg9baIQC.js';
 
 function getLangName(langCode) {
   try {
