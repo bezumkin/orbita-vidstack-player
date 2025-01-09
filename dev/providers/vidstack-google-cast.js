@@ -41,7 +41,6 @@ class GoogleCastMediaInfoBuilder {
   }
 }
 
-const REMOTE_TRACK_TEXT_TYPE = chrome.cast.media.TrackType.TEXT, REMOTE_TRACK_AUDIO_TYPE = chrome.cast.media.TrackType.AUDIO;
 class GoogleCastTracksManager {
   #cast;
   #ctx;
@@ -70,11 +69,11 @@ class GoogleCastTracksManager {
   #getRemoteActiveIds() {
     const activeIds = [], activeLocalAudioTrack = this.#getLocalAudioTracks().find((track) => track.selected), activeLocalTextTracks = this.getLocalTextTracks().filter((track) => track.mode === "showing");
     if (activeLocalAudioTrack) {
-      const remoteAudioTracks = this.#getRemoteTracks(REMOTE_TRACK_AUDIO_TYPE), remoteAudioTrack = this.#findRemoteTrack(remoteAudioTracks, activeLocalAudioTrack);
+      const remoteAudioTracks = this.#getRemoteTracks(chrome.cast.media.TrackType.AUDIO), remoteAudioTrack = this.#findRemoteTrack(remoteAudioTracks, activeLocalAudioTrack);
       if (remoteAudioTrack) activeIds.push(remoteAudioTrack.trackId);
     }
     if (activeLocalTextTracks?.length) {
-      const remoteTextTracks = this.#getRemoteTracks(REMOTE_TRACK_TEXT_TYPE);
+      const remoteTextTracks = this.#getRemoteTracks(chrome.cast.media.TrackType.TEXT);
       if (remoteTextTracks.length) {
         for (const localTrack of activeLocalTextTracks) {
           const remoteTextTrack = this.#findRemoteTrack(remoteTextTracks, localTrack);
@@ -87,7 +86,7 @@ class GoogleCastTracksManager {
   #syncLocalTracks() {
     const localTextTracks = this.getLocalTextTracks();
     if (!this.#cast.isMediaLoaded) return;
-    const remoteTextTracks = this.#getRemoteTracks(REMOTE_TRACK_TEXT_TYPE);
+    const remoteTextTracks = this.#getRemoteTracks(chrome.cast.media.TrackType.TEXT);
     for (const localTrack of localTextTracks) {
       const hasRemoteTrack = this.#findRemoteTrack(remoteTextTracks, localTrack);
       if (!hasRemoteTrack) {
@@ -98,7 +97,7 @@ class GoogleCastTracksManager {
   }
   syncRemoteTracks(event) {
     if (!this.#cast.isMediaLoaded) return;
-    const localAudioTracks = this.#getLocalAudioTracks(), localTextTracks = this.getLocalTextTracks(), remoteAudioTracks = this.#getRemoteTracks(REMOTE_TRACK_AUDIO_TYPE), remoteTextTracks = this.#getRemoteTracks(REMOTE_TRACK_TEXT_TYPE);
+    const localAudioTracks = this.#getLocalAudioTracks(), localTextTracks = this.getLocalTextTracks(), remoteAudioTracks = this.#getRemoteTracks(chrome.cast.media.TrackType.AUDIO), remoteTextTracks = this.#getRemoteTracks(chrome.cast.media.TrackType.TEXT);
     for (const remoteAudioTrack of remoteAudioTracks) {
       const hasLocalTrack = this.#findLocalTrack(localAudioTracks, remoteAudioTrack);
       if (hasLocalTrack) continue;
